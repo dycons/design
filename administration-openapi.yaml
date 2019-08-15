@@ -1,0 +1,50 @@
+consumes:
+- application/json
+info:
+  description: A model service for storing and distributing administrative data, some of which is re-identifying
+  title: A barebones service for administrative information (identifying and otherwise)
+  version: 1.0.0
+produces:
+- application/json
+schemes:
+- http
+openapi: "1.0.3" # TODO double-check this
+
+paths:
+
+definitions:
+  Error: # TODO flesh out like in consents-openapi doc
+    type: object
+    required:
+      - message
+    properties: 
+      code:
+        type: integer
+      message:
+        type: string
+  Enrollment:
+    type: object
+    required:
+      - participant_id
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Unique internal identifier for this resource
+        example: bf3ba75b-8dfe-4619-b832-31c4a087a589
+        readOnly: true
+      created:
+        type: string
+        format: date-time
+        description: Creation time
+        example: "2017-07-21T17:32:28Z"
+        readOnly: true
+      participant_id:
+        type: string
+        format: uuid
+        description: Unique internal identifier for the enrolled/enrolling participant. Links this resource to their other administrative information.
+        example: bf3ba75b-8dfe-4619-b832-31c4a087a589
+      is_active:
+        type: boolean
+        description: Whether or not this enrollment is active for use in DyCons registration
+        example: false
