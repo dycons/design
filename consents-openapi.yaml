@@ -1,0 +1,119 @@
+consumes:
+- application/json
+info:
+  description: A prototype microservice that stores participant data_sharing consent, metadata that may be used to inform row-level data access decisions, with respects to contextual integrity.
+  title: A barebones service for consent metadata
+  version: 1.0.0
+produces:
+- application/json
+schemes:
+- http
+openapi: "3.0.2"
+
+paths:
+  /consents/master:
+    post:
+      operationId: post_master_consent
+      summary: Add master consent metadata for a set of study data to the database
+      parameters:
+      - name: master_consent
+        in: body
+        schema:
+          $ref: '#/definitions/MasterConsent'
+          example:
+            # TODO
+      responses:
+        201:
+          description: New master consent created
+          schema:
+            $ref: '#/definitions/MasterConsent'
+          headers:
+            Location:
+              type: string
+              format: url
+        405:
+          description: Forbidden to overwrite master consent in post
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Internal error - master consent not created
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      operationId: get_master_consents
+      summary: Get all master consents
+      responses:
+        200:
+          description: Return master consents
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/MasterConsent'
+            example: []
+        500:
+          description: Internal error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /consents/master/{study_identifier}:
+    get:
+      operationId: get_one_master_consent
+      summary: Get specific master consent by its associated study_identifier
+      parameters:
+      - $ref: '#/parameters/study_identifier'
+      responses: 
+        200:
+          description: Return master consent
+          schema:
+            $ref: '#/definitions/MasterConsent'
+        404:
+          description: Master consent not found
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: Internal error
+          schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  Error:
+    type: object
+    required:
+      - code
+      - message
+    properties: 
+      code:
+        type: integer
+        minimum: 100000
+        maximum: 599999
+        description: Computer-readable error code, format 'HHHDDD' where HHH is the HTTP code and DDD is the error-specific detail codes
+        example: 500001
+      message:
+        type: string
+        description: Human-readable informational error message
+        example: "Forbidden to modify existing master consent on post"
+  MasterConsent:
+    type: object
+    required:
+      - study_identifier
+      - somatic_consent
+      - germline_consent
+      - clinical_consent
+    properties:
+      study_identifier:
+        type: string
+        format: uuid
+        description: Unique identifier that links study data to its consent metadata
+        example: bf3ba75b-8dfe-4619-b832-31c4a087a589
+      created:
+        type: string
+        format: date-time
+        description: Creation time
+        example: "2017-07-21T17:32:28Z"
+        readOnly: true
+      somatic_consent:
+        type: string
+        description: Description of subject (may be external identifier)
+        example: "Subject 17"
+        minLength: 1
+        maxLength: 100
