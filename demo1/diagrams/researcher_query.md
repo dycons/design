@@ -1,4 +1,5 @@
-For use in: http://www.plantuml.com/plantuml/uml/rLB1ZjCm43tZhnZjgIjjnRrIqLOj8BHKj1iaBboyphGrSUnWJrgLhsViZKlJKB52ui0bhJNllNdpPku3IKzjROHKv3nu32Yzsg4N3HUqqesq13SFU5J6oGf67yhLxGt800_pFcJTeZ_2Uqbua4Tu3L-ShpR67M2sHKk9GiUgprdeG5u_jOGbp8tKTO2bj7AB7aQVZnMiJBlLzZQJ6txs1HxVBejKzLY72sr9CY310etUHsi5-hrMcE1bUO7-j9gbWcka4DCfp5hQeUMw9EqiJAT2_Ce6nczuV9X0qJxLci8bMjkDytNwBnWtPlWPUS8FXUnfm2DNeKtjKvYTF64vx1_ZE3FmFU4FcdOWMJChCOYnEJh6iw-3z6N8W5n93ZdzILBIR2tQ8eCr_uOad2a9D-wfFc9ed2qxNDa5Rt2F1bHQwwbJPfvPwH3PBAzc0g4tbxJb2IKDGQ7jrc1iwrgly3aj8PXv4bXtOnYd99jmDiH1CYQkcNs_onOySgD0C8eBkVjgksvtEOtRQ26hf065Y18d9TwAghfcZJDQCKa8WEYMJmj6gyMAHPh6kprsOyKwG9B9hdy7E9-gGHylQrZFeVh19X8e5Y_Ey1eMJS0ponw_eQAhZdFzXOPQ6w_JUVq3onpwomnUvw8jnIkHR2zRGtfm5W1_kVH8xMrvVdtB2N5rlqc0-HubSRbOVupDMhQyyQxEJjAHdNHX67R1ipwpKuDE8_pfJb9-6VmFZYPV3NlzJ-v5YFYzvqzRcvy0
+For use in:
+http://www.plantuml.com/plantuml/uml/rLB1ZjCm43tZhnZjgIjjnRrIqLOj8BHKj1iaBboyphGrSUnWJrgLhsViZKlJKB52ui0bhJNllNdpPku3IKzjROHKv3nu32Yzsg4N3HUqqesq13SFU5J6oGf67yhLxGt800_pFcJTeZ_2Uqbua4Tu3L-ShpR67M2sHKk9GiUgprdeG5u_jOGbp8tKTO2bj7AB7aQVZnMiJBlLzZQJ6txs1HxVBejKzLY72sr9CY310etUHsi5-hrMcE1bUO7-j9gbWcka4DCfp5hQeUMw9EqiJAT2_Ce6nczuV9X0qJxLci8bMjkDytNwBnWtPlWPUS8FXUnfm2DNeKtjKvYTF64vx1_ZE3FmFU4FcdOWMJChCOYnEJh6iw-3z6N8W5n93ZdzILBIR2tQ8eCr_uOad2a9D-wfFc9ed2qxNDa5Rt2F1bHQwwbJPfvPwH3PBAzc0g4tbxJb2IKDGQ7jrc1iwrgly3aj8PXv4bXtOnYd99jmDiH1CYQkcNs_onOySgD0C8eBkVjgksvtEOtRQ26hf065Y18d9TwAghfcZJDQCKa8WEYMJmj6gyMAHPh6kprsOyKwG9B9hdy7E9-gGHylQrZFeVh19X8e5Y_Ey1eMJS0ponw_eQAhZdFzXOPQ6w_JUVq3onpwomnUvw8jnIkHR2zRGtfm5W1_kVH8xMrvVdtB2N5rlqc0-HubSRbOVupDMhQyyQxEJjAHdNHX67R1ipwpKuDE8_pfJb9-6VmFZYPV3NlzJ-v5YFYzvqzRcvy0
 
 
 @startuml
@@ -9,6 +10,13 @@ participant "Distributed Claims Manager (Tyk Plugin)" as tykplug
 participant "REMS" as rems
 participant "Dataset Delivery Service" as dds
 participant "OPA" as opa
+participant "Consent Service" as cs
+
+== Scheduled Update of Consent Metadata ==
+
+dds -> cs : GET /project_consents
+cs -> dds : project consents for all data
+dds -> dds : update local consents db
 
 == Authentication ==
 
@@ -56,7 +64,7 @@ opa -> opa : check local policies
     tyk --> researcher: responds with unauthorized request
 
   end
-	
+  
 else Multi Resource Query
 
   dds -> opa : Forwards request (Auth,\n claims, queries)
