@@ -6,11 +6,16 @@ participant "Application Services" as as
 participant "Authz Metadata Agent" as ama
 participant "Consents Service" as cs
 
+== Initialize a new participant by creating their default consents ==
+
 psd -> cs: POST /default_consents
 cs -> cs: Create participant linked to these default consents
 cs --> psd: 201 Created \nURL: /participants/{study_identifier}/default_consents
+
+== Create/Update data for a participant ==
+
 psd -> as: POST|PUT /data \nBody: data, {study_identifier}
-as -> ama: POST /update_consents/{study_identifier}
+as -> ama: POST /consents/update \nBody:[{study_identifier}]
 ama -> cs: GET /participants/{study_identifier}/project_consents
 
 alt Participant exists in Consents Service
