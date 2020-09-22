@@ -1,4 +1,5 @@
-http://www.plantuml.com/plantuml/uml/pPB1Yjim48RlUeeXzx3tWBjRbhAKik2ksriXgD8a7cBBHYEbk4zVMR68d3ffwAMz62DzC_FFXvxOIUjysmYfN6TXzOQCqgeQod1EYdfft0eaW-r5Vpw2rKTTndFI5nUVS80tREG05TeZAOpOmV8SU-uCet4pIB4GeYZWlNSrci1AHvs1eX32zh1-Dmw33LJ-UqkEBp4okywsyL-Cu3eKs96tg92E-5k1wmveJXDJckTQcZt6YU7q1HsyIdPe4y1PcB3I1bu-VDd0GnkXhPgWRmP-aAlZl6bAW5CDa1v3x0WPSYMUoUn1BjUKQCVjEDvtbdx65Hv5WbHWFdkqOzC0pXfFiMQ2LAXAlK_f4yQnvsHluNBoKZclXpzeIKMFP5JZDHOSYWZ_DpySLqbXSpNBJh9JsJXuxJJjXWjHGW1aFiglzpqJWByH0N2FYZEchYKAoCs70N3pQM33c7HKkLIng2CLFaZTajbcAsv9htbi47x-kQKiQCnqBUXStZLhkIwZnLFu-BRv1G00
+For use in:
+http://www.plantuml.com/plantuml/uml/rPHDZzem48Rl_XKZxWZKOwIqzAD25QeQ0Jsr5NBjIN59xCXsM6KH_tqTux31YyXbjTgz8ViPlsyUZPWPIxMjou9GPfM6qH8DKissaBbpmKH5fHq1DQ0hKZqUmUWRp_ovuD750XjOOa4RMA7U2uOUssbpYNrMqg2q5n0pX90qXO-rtQ9qBBL2IKXJGdG5u_Tj62Imgl-MmfeO4p9NklI_IGkEtO1kUOqCnHwV35YrG-a3vsZX2-QqBYo4OgONwyedCF-wJc32JzI6TTHlUIVirZyT7dJqUKZmDYyNQA3_zRKHyX_GwpCPwlP3ZBzNMjpxjXz81x5J6PZqNZIJWx4rRpRdG7sCknBcnhkGTzCf_5YuzfyKRn88A0JKPmM1msmGc6dr7zcGmCfJRqDWtFMMmLy1XWx-4qiSn9t7xugBl8btCJQP_Lo_casCkyIYRkzMVDcN4FRffeJXRJeRFtGihQeY_0Li13--aALdNhV0NfSwmCvGyhei7W00
 
 @startuml
 actor "Research Participant" as rp
@@ -12,53 +13,47 @@ participant "Consent Service" as cs
 rp -> idp : Submits Authentication information
 idp --> rp : receives Authentication token
 
+== Get Default Consents ==
 
-== Consent Change ==
-
-== Get Master Consents ==
-
-rp -> krs: GET: /master_consents\n with Auth token
+rp -> krs: GET: /default_consents \nwith Auth token
 krs -> krs: identifies participant using auth token
 krs -> krs: Performs authorization?
 
-krs -> cs: Queries for participant consent information
-cs --> krs: master consents
+krs -> cs: GET /participants/{study_identifier}/default_consent
+cs --> krs: 200 OK \nBody: default consent
 
-krs --> rp: master consents
+krs --> rp: 200 OK \nBody: default consent
 
-== Get Study Consents ==
+== Get Project Consents ==
 
-rp -> krs: GET: /consents?include=studies\n with Auth token
+rp -> krs: GET: /project_consents \nwith Auth token
 krs -> krs: identifies participant using auth token
 krs -> krs: Performs authorization?
 
-krs -> cs: Queries for participant study consents
-cs --> krs: consents
+krs -> cs: GET /participants/{study_identifier}/project_consents
+cs --> krs: 200 OK \nBody: [project consents]
 
-krs --> rp: consents
+krs --> rp: 200 OK \nBody: [project consents]
 
-alt Modify master consent
+== Modify Default Consent ==
 
-  rp -> krs: PUT: /master_consents\n with Auth token
-  krs -> krs: identifies participant using auth token
-  krs -> krs: Performs authorization?
+rp -> krs: PUT /default_consents \nwith Auth token
+krs -> krs: identifies participant using auth token
+krs -> krs: Performs authorization?
 
-  krs -> cs: PUT: /master_consents
-  cs --> krs: master consents
+krs -> cs: PUT /default_consents
+cs --> krs: default consent
 
-  krs --> rp: master consents
+krs --> rp: default consent
 
-else Modify Study consent
+== Modify Project Consent ==
 
+rp -> krs: PUT /project_consents \nwith Auth token \nBody: {project_application_id}
+krs -> krs: identifies participant using auth token
+krs -> krs: Performs authorization?
 
-  rp -> krs: PUT: /consents/admin_participant_id-study_id\n with Auth token
-  krs -> krs: identifies participant using auth token
-  krs -> krs: Performs authorization?
+krs -> cs: PUT /participants/{study_identifier}/project_consents
+cs --> krs: 200 OK \nBody: project consent
 
-  krs -> cs: PUT: /consents/study_participant_id-study_id
-  cs --> krs: consents
-
-  krs --> rp: consents
-
-end
+krs --> rp: 200 OK \nBody: project consent
 @enduml
