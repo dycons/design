@@ -1,45 +1,42 @@
 For use in:
-http://www.plantuml.com/plantuml/uml/rPHDZzem48Rl_XKZxWZKOwIqzAD25QeQ0Jsr5NBjIN59xCXsM6KH_tqTux31YyXbjTgz8ViPlsyUZPWPIxMjou9GPfM6qH8DKissaBbpmKH5fHq1DQ0hKZqUmUWRp_ovuD750XjOOa4RMA7U2uOUssbpYNrMqg2q5n0pX90qXO-rtQ9qBBL2IKXJGdG5u_Tj62Imgl-MmfeO4p9NklI_IGkEtO1kUOqCnHwV35YrG-a3vsZX2-QqBYo4OgONwyedCF-wJc32JzI6TTHlUIVirZyT7dJqUKZmDYyNQA3_zRKHyX_GwpCPwlP3ZBzNMjpxjXz81x5J6PZqNZIJWx4rRpRdG7sCknBcnhkGTzCf_5YuzfyKRn88A0JKPmM1msmGc6dr7zcGmCfJRqDWtFMMmLy1XWx-4qiSn9t7xugBl8btCJQP_Lo_casCkyIYRkzMVDcN4FRffeJXRJeRFtGihQeY_0Li13--aALdNhV0NfSwmCvGyhei7W00
+http://www.plantuml.com/plantuml/uml/pPDFQzj04CNl-oa6drf8SEZHu3RzKq88fS99Jqq9czrHDBMqg-wENDIGxzwHMCcn71mAXVPcDBytR-Rj-3Io3jnKfTA6VO3P2YFgO0h8v3iPghNZ6UW8eLRrzXFCpcrsxLvSO6jAhzSlUuRi198ohB3KBLnYs9317bk7k8kzzowYuxX3cQYKMYxXRSC5Ee4ratUmN2eLQZX-tRd10YwRsueuJZ5okGzL_rjruB48GiUlq21jS4_0VeskDpn3Xd6YhPrClO2pZrSmDqFnslqaBlfEIUyy8mIwArX13zzwgLdCTLCoQ6UX3luxcguyjY47tXdHuOy68nz9ZJr4lK5Wgb2XoBh6IaOO9yamT1j6qEBk0_tgrtYpmvpRRi6SCCBZl9j8xWxqEBNiaIERGh3xo8rjRsWGXWSrT3J3-ezQnVc-O9wslKdxAIFoOQ9N9oVm-K8CttdRBiPW4lhdNYdDmIiUClkQu37uRyclFutdPZjwKY_dyibRobluaF1qETF3oRvSmPZCWGFwvq-yF-WqraamEo7k5xS9PIc-GmcbY0yaDBxF_S3gkYxJlrYsUlXF8loRbvlOfn9_bZr5Pvkg_0q0
 
 @startuml
 actor "Research Participant" as rp
-participant "IdP" as idp
+participant "IdP\n(Keycloak)" as idp
 participant "Key Relay Service" as krs
-participant "Consent Service" as cs
+participant "Consents Service" as cs
 
 
 == Authentication ==
 
 rp -> idp : Submits Authentication information
-idp --> rp : receives Authentication token
+idp --> rp : Receives Authentication token
 
-== Get Default Consents ==
+== Get Consents ==
 
-rp -> krs: GET: /default_consents \nwith Auth token
-krs -> krs: identifies participant using auth token
+rp -> krs: GET /consents \nwith Auth token
+note right
+  GET both default and project
+  consents in once request,
+  to save time
+end note
 krs -> krs: Performs authorization?
+krs -> krs: Identifies participant using auth token \nfetches {study_identifier}
 
 krs -> cs: GET /participants/{study_identifier}/default_consent
 cs --> krs: 200 OK \nBody: default consent
 
-krs --> rp: 200 OK \nBody: default consent
-
-== Get Project Consents ==
-
-rp -> krs: GET: /project_consents \nwith Auth token
-krs -> krs: identifies participant using auth token
-krs -> krs: Performs authorization?
-
 krs -> cs: GET /participants/{study_identifier}/project_consents
 cs --> krs: 200 OK \nBody: [project consents]
 
-krs --> rp: 200 OK \nBody: [project consents]
+krs --> rp: 200 OK \nBody: default consent, [project consents]
 
 == Modify Default Consent ==
 
 rp -> krs: PUT /default_consents \nwith Auth token
-krs -> krs: identifies participant using auth token
 krs -> krs: Performs authorization?
+krs -> krs: Identifies participant using auth token \nfetches {study_identifier}
 
 krs -> cs: PUT /default_consents
 cs --> krs: default consent
@@ -49,8 +46,8 @@ krs --> rp: default consent
 == Modify Project Consent ==
 
 rp -> krs: PUT /project_consents \nwith Auth token \nBody: {project_application_id}
-krs -> krs: identifies participant using auth token
 krs -> krs: Performs authorization?
+krs -> krs: Identifies participant using auth token \nfetches {study_identifier}
 
 krs -> cs: PUT /participants/{study_identifier}/project_consents
 cs --> krs: 200 OK \nBody: project consent
