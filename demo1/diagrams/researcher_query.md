@@ -1,65 +1,77 @@
 For use in:
-http://www.plantuml.com/plantuml/uml/rLNDRXCn43xZfnZrb4gjk5SAQjK2GYKYwI9nuU9w9ubPhxtOiud2qpDsRPRDqbH2ui35IVJzp3S_Kgu3IKzzQuHKv3nu32Yzsg8N7GDQwKvQWhDxF2ZZP0Ep3_No_0naWFlRCMNLep_0UqcubmTu3L-SRzR6xU5cWvQIX0xDM7Ed0tdzs1FMS6kaRWCif9KRz33xV6XWQVgDjkT5tF7FiS73sqMLK8zjEFAM90CItA7HknYjGh_J2XEzhe_OdvOt2N2T568-XvkUjcWPbwITXVbSY64sSFc6suShgFh7LbCuPckxThvDtmNpBfa-Y5dcKI5dckZ8DMXJ-JJCR4zOJ-l7SVmMu7lYxpLjGR9dTc8EKylacCwnzjBN8UC5IFdQm8JeepbO34K6M_uCqROu9jhboFC1G-TidMbrdhh17HfGQQUbJX4EEJAX1EMjN44OjIHjNKX26e9Asut1MDJrNk7Je8I0gFrbiSfT6ASaXt0sn3u64Y-PWxyh8JnohK0mY-ku-6fpmOioZVEOejYa3WL4Zy6AbwAQNAvpHYjMnL0nCLyMp9PtItRfEkzsc5jZEBkKs5Dyr5M7FfxL12v3zPD590vZHnVuHofpqGGSuZBf6ofwBkq4Ffccj_4idTS_i2xpFfNkPIdQMhmIAVAYDwGd9_7NspvUxks9vJBZcRLcFSizIcAqMdsCfNeElFQkBJdIRHNRwPGhxZDfdzopGtZXEDBa2lTVNGhd_0zkHCJdcf_u9_SJ
+http://www.plantuml.com/plantuml/uml/pLJ1RXit43sNNp78fIrW8IsQam0NSLDRSUiqIcIWEVGoMeuaLhiao-76TR--CqkgAycEd5jpiOMTuPlttZpo9MTCkUzQWqqE2H8nOMesb4oKWcjSH9_XsVl_liCyf8pjCq2650-xVgNxfWsuXM-kxVpReMNR705TlbcKizJnqMdCtCDL2ZwJj-Nqwf6MKj5VXyMtyukX528Upvoz5TgjV22kmzV1cFDpkEZpXhoqOdR1m_cvCQC5CFbH9C8KhhtB3ZCnC35Bev7F4wsElLEPm9dX9goTXsMVS_2FORqI6jlZjgZbRIFbzsHTeYP33e0ZEOAUAHbfEJMLcqHqE7M7k-YNdSiym7Ziw0mYCj-5P0VGokvW_8BIHzSGp5FuwAo0tRcy6KZ1Bx_Vdh3WTUYeSe4_V1DyHkUTNrUvYhrCuOu9XdqEYxYYt6oqHmC2SjQgScnPTtB2nn7ofpt8wgXcJ5hVzPJkuJb6zpnIwjomGWRaOgfsZGxCBbxCNiCScMD86VROeyeU1OraMtGTgueogNgToGxSwt9NbOWZXjdbRQ7Zl7NYRIyw1NZmzyFarSLlFr_F9fSVRYS3_ePGtH_77d4qWgqJLFWKhaAwmsGP_XgudCGqFcI2bbPv-kHStjlqryfMOl6d9WLNAzUwSd-S1uaih4Bg8Am0TVyOOrllryHPOx3Di10LBKdQEFIfeUARCL14xAdPETQ61bkbmkGpwm0Pv1WEmVS1GaJOSoEH-C7vJ0XzIkcPyBMx6M0nem65AKbQ1mtTXffj9HFhWsBCs2R_fh0cJmcpidQSnOTYWjmYiWCiqoYXPh0YZC8NvEq8yE3u8rP5IkfxNRmqx2qtxOnUaZW_T3Yooa6uTNYllK1_ksAGpEfYBf5_yTttUZggA-9J8bMhAxofrEJLdJnKvxX02evIgMoBmDMq8bekyQnMWvJgFVnanuD7fxuv6hkHvqe4xDuM06gPdgJxcLHxh-zVIEuVihjCdQGk1lwWALmwQycVrd00tX4phadvUsk-CeEADtsRtV6r-LzI_qM47lRdBjxTw5Cio0mv2D7OjrAex-f3j98IoSEJTwaiicARpyhowIGRSo85ZwPOC_1I_lHT-oy0
 
 
 @startuml
 actor researcher
-participant "Keycloak (IdP)" as KC
-participant "Query Gateway / Workflow Agent" as tyk
-participant "Distributed Claims Manager (Tyk Plugin)" as tykplug
+participant "Researcher Portal" as rp
+participant "Keycloak (IdP)" as kc
 participant "REMS" as rems
-participant "Dataset Delivery Service" as dds
+participant "Katsu Frontend" as kf
+participant "Katsu" as katsu
 participant "OPA" as opa
+participant "REGO Policies" as rego
 
 == Authentication ==
 
-researcher -> KC : Submits Authentication information
-KC --> researcher : receives Authentication token
+researcher -> rp : Initiates session
+rp --> researcher : Posts Login button
+researcher -> rp : Clicks Login button
+rp -> kc : Redirect to authenticate user
+kc -> researcher : Posts Login screen
+researcher --> kc : Submits username, password
+kc --> rp : Redirect to Service Provider with auth JWT
+rp --> researcher : Posts Home screen \ncontaining button to browse Katsu
+
+== Fetching REMS credentials ==
+
+researcher -> rp : Clicks button to Browse Katsu
+rp -> rems : Query /api/permissions as user
+rems --> rp : GA4GH Passport containing a JWT \ncontaining REMS claims
 
 == Query Submitted ==
 
-researcher -> tyk : Submits query with auth token
-tyk -> tykplug : forwards token
-tykplug -> rems : queries entitlements with token
-rems --> tykplug : Responds with dataset level claims
-tykplug --> tyk: forwards claims
-tyk -> dds: submits query and claims
+rp -> kf : Queries GET /api/individuals \nwith X-CANDIG-EXT-REMS header containing GA4GH Passport
+kf -> katsu: Forwards query with X-CANDIG-EXT-REMS header
+note left: X-CANDIG-EXT-REMS header contains researcher's \nProject affiliation in the form of an \napplication-id
 
 alt Single Resource Query
 
-  dds -> dds: Queries local consents
-  dds -> opa : Forwards request (Auth,\n claims, queries) and consent data
-  opa -> opa : check local policies
+  katsu -> katsu: Queries local consents for this application-id
+  katsu -> opa : Forwards request, \nX-CANDIG-EXT-REMS header, and consent data
+  opa -> rego : Check local policies
 
-  alt OPA (PDP) approves query
-    opa --> dds: approves query
-    dds -> dds: performs query
-    dds --> tyk: responds with data
-    tyk --> researcher: responds with data
 
-  else OPA (PDP) rejects query
-    opa --> dds: rejects query
-    dds --> tyk: responds with unauthorized request
-    tyk --> researcher: responds with unauthorized request
+  opa -> opa: generates list of \napproved datasets for this user
+  opa --> katsu: Sends list of approved datasets
+  katsu -> katsu: performs query
+  note left: resource being queried for \nmay not exist, \nprompting a 401 response here
+
+  alt List of OPA-approved datasets is not empty
+    katsu --> kf: responds with data
+    kf --> rp: responds with data
+    rp --> researcher: Posts the response from Katsu
+
+  else List of OPA-approved datasets is empty
+    katsu --> kf: responds with unauthorized request
+    kf --> rp: responds with 403 Forbidden
+    rp --> researcher: Posts unauthorized message
   end
 	
 else Multi Resource Query
 
-  dds -> opa : Forwards request (Auth,\n claims, queries)
-  opa -> opa : Check local policies
+  katsu -> opa : Forwards request, \nX-CANDIG-EXT-REMS header, and consent data
+  opa -> rego : Check local policies
 
-  alt opa approves query
-    opa -> opa: Creates SQL clause from request and policies
-    opa --> dds: Sends SQL query clauses
-    dds -> dds: performs query with clauses
-    dds --> tyk: responds with data
-    tyk --> researcher: responds with data
+  opa -> opa: generates list of \napproved datasets for this user
+  opa --> katsu: Sends list of approved datasets
+  katsu -> katsu : generates SQL clauses to populate \nwith approved datasets from OPA
+  katsu -> katsu: performs query with clauses
+  katsu --> kf: responds with data
+  kf --> rp: responds with data
 
-  else opa rejects query
-    opa --> dds: rejects query
-    dds --> tyk: responds with unauthorized request
-    tyk --> researcher: responds with unauthorized request
-  end
+
+  rp --> researcher: Posts response from Katsu
 
 end
 @enduml
